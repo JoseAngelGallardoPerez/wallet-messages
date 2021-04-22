@@ -1,0 +1,20 @@
+CREATE TABLE `messages` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `message` text NOT NULL,
+  `subject` varchar(255) DEFAULT NULL,
+  `recipient_id` varchar(36) DEFAULT NULL,
+  `sender_id` varchar(36) DEFAULT NULL,
+  `edited` tinyint(1) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  `deleted_for_sender` tinyint(1) DEFAULT NULL,
+  `deleted_for_recipient` tinyint(1) DEFAULT NULL,
+  `parent_id` int(11) unsigned DEFAULT NULL,
+  `is_sender_read` tinyint(4) DEFAULT NULL,
+  `is_recipient_read` tinyint(4) DEFAULT NULL,
+  `delete_after_read` tinyint(1) DEFAULT 0,
+  `is_recipient_incoming` tinyint(1) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `parent_index` (`parent_id`),
+  CONSTRAINT `FK_messages_parent` FOREIGN KEY (`parent_id`) REFERENCES `messages` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

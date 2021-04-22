@@ -1,0 +1,25 @@
+syntax="proto3";
+
+package velmie.wallet.messages;
+option go_package = "messages";
+
+message SendMessageReq {
+  string recipientId = 1;
+  string senderId = 2;
+  string subject = 3;
+  string message = 4;
+  bool deleteAfterRead = 5;
+  bool doNotDuplicateIfExists = 6;
+}
+
+message MessageResp {
+  uint64 id = 1;
+  string recipientId = 2;
+  string senderId = 3;
+  string subject = 4;
+  string message = 5;
+}
+
+service MessageSender {
+  rpc SendMessage(SendMessageReq) returns (MessageResp);
+}

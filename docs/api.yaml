@@ -1,0 +1,875 @@
+openapi: 3.0.0
+info:
+  version: "1.0.1"
+  title: Wallet Message Service
+security:
+  - bearerAuth: []
+paths:
+  /messages/private/v1/messages:
+    post:
+      security:
+        - bearerAuth: []
+      summary: Creates a new message.
+      description: Available for users and admins.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessagePostRequest'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+    get:
+      security:
+        - bearerAuth: []
+      summary: Shows user messages.
+      description: |
+        Available for users and admins.
+        \
+        Returns a list of messages for current user.
+      parameters:
+        - in: query
+          name: type
+          description: Applies filter by type of message.
+          schema:
+            type: string
+            enum:
+              - incoming
+              - outgoing
+        - in: query
+          name: parent
+          description: Applies filter by parent id of message.
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/IsUnreadFilter'
+        - $ref: '#/components/parameters/SortField'
+        - $ref: '#/components/parameters/SortDir'
+        - $ref: '#/components/parameters/SearchFieldFilter'
+        - $ref: '#/components/parameters/SearchQueryFilter'
+        - $ref: '#/components/parameters/DateFromFilter'
+        - $ref: '#/components/parameters/DateToFilter'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/messages/{id}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Shows a message.
+      description: Returns a message object. This finds message by id in current user messages.
+      parameters:
+        - in: path
+          name: id
+          description: Message ID.
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+    patch:
+      security:
+        - bearerAuth: []
+      summary: Updates a message.
+      description: Updates a message by id. The message must belong to current user.
+      parameters:
+        - in: path
+          name: id
+          description: Message ID.
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMessage'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+    put:
+      security:
+        - bearerAuth: []
+      summary: Updates a message.
+      description: Updates a message by id. The message must belong to current user.
+      parameters:
+        - in: path
+          name: id
+          description: Message ID
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateMessage'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/messages/{id}/for-me:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Deletes a message for current user.
+      description: Deletes a message for current user but it still appears for another user related with this message.
+      parameters:
+        - in: path
+          name: id
+          description: Message ID
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/messages/{id}/for-all:
+    delete:
+      security:
+        - bearerAuth: []
+      summary: Delete  message for all.
+      description: Deletes a message for a recepient and for a sender.
+      parameters:
+        - in: path
+          name: id
+          description: Message ID.
+          schema:
+            type: integer
+          required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/admin/messages/unassigned-and-incoming:
+    get:
+      tags:
+        - For admins
+      security:
+        - bearerAuth: []
+      summary: Shows unassigned and incoming messages.
+      description: Available for users and admins.
+      parameters:
+        - $ref: '#/components/parameters/IsUnreadFilter'
+        - $ref: '#/components/parameters/SortField'
+        - $ref: '#/components/parameters/SortDir'
+        - $ref: '#/components/parameters/SearchFieldFilter'
+        - $ref: '#/components/parameters/SearchQueryFilter'
+        - $ref: '#/components/parameters/DateFromFilter'
+        - $ref: '#/components/parameters/DateToFilter'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/admin/messages:
+    get:
+      tags:
+        - For admins
+      security:
+        - bearerAuth: []
+      summary: Shows all messages.
+      description: Available for admins.
+      parameters:
+        - $ref: '#/components/parameters/SortField'
+        - $ref: '#/components/parameters/SortDir'
+        - $ref: '#/components/parameters/SearchFieldFilter'
+        - $ref: '#/components/parameters/SearchQueryFilter'
+        - $ref: '#/components/parameters/DateFromFilter'
+        - $ref: '#/components/parameters/DateToFilter'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/admin/messages/send-to-all:
+    post:
+      tags:
+        - For admins
+      security:
+        - bearerAuth: []
+      summary: Sends message to all users.
+      description: Available for admins.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SentToAllMessage'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/admin/messages/send-to-user-group:
+    post:
+      tags:
+        - For admins
+      security:
+        - bearerAuth: []
+      summary: Sends message to users from group.
+      description: Available for admins.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SentToUserGroupMessage'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/admin/messages/send-to-specific-users:
+    post:
+      tags:
+        - For admins
+      security:
+        - bearerAuth: []
+      summary: Sends message to specific users.
+      description: Available for admins.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SentToSpecificUsersMessage'
+        required: true
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+  /messages/private/v1/count/messages/unread:
+    get:
+      security:
+        - bearerAuth: []
+      summary: Responds with count of unread messages for current user.
+      description: Available for all logged in users.
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      count:
+                        type: integer
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequestResponse'
+        401:
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedResponse'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ForbiddenResponse'
+        500:
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerErrorResponse'
+
+
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        data:
+          type: object
+    ServerErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    BadRequestResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    UnauthorizedResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    ForbiddenResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+    Error:
+      type: object
+      properties:
+        status:
+          type: integer
+        code:
+          type: integer
+        title:
+          type: string
+        details:
+          type: string
+    UpdateMessage:
+      type: object
+      properties:
+        message:
+          type: string
+        recipientId:
+          type: string
+    MessagePostRequest:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/MessageWithParentPostRequest'
+        - $ref: '#/components/schemas/MessageWithRecipientPostRequest'
+      example:
+        message: Hello World!
+        recipient: 1
+    MessageWithParentPostRequest:
+      type: object
+      properties:
+        message:
+          type: string
+        parentId:
+          type: integer
+      required:
+        - message
+        - parentId
+    MessageWithRecipientPostRequest:
+      type: object
+      properties:
+        message:
+          type: string
+        recipient:
+          type: integer
+          example: 2
+      required:
+        - message
+        - recipient
+    Messages:
+      type: object
+      properties:
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+            first:
+              type: string
+            last:
+              type: string
+            next:
+              type: string
+            prev:
+              type: string
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    Message:
+      type: object
+      properties:
+        object:
+          type: string
+          example: messages
+        id:
+          type: integer
+          example: 1
+        sender:
+          type: integer
+          example: 1
+        recipient:
+          type: integer
+          example: 2
+        message:
+          type: string
+          example: Hello World!
+        subject:
+          type: string
+          example: Transactions issue
+        createdAt:
+          type: string
+          example: 2018-06-18-14:00
+        updatedAt:
+          type: string
+          example: 2018-06-18-14:00
+        edited:
+          type: boolean
+          example: false
+        isSenderRead:
+          type: boolean
+          example: true
+        isRecipientRead:
+          type: boolean
+          example: true
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+    SentToAllMessage:
+      type: object
+      properties:
+        message:
+          type: string
+        subject:
+          type: string
+        deleteAfterRead:
+          type: boolean
+      required:
+        - message
+    SentToUserGroupMessage:
+      type: object
+      properties:
+        message:
+          type: string
+        subject:
+          type: string
+        deleteAfterRead:
+          type: boolean
+        userGroupId:
+          type: integer
+      required:
+        - message
+        - userGroupId
+    SentToSpecificUsersMessage:
+      type: object
+      properties:
+        message:
+          type: string
+        subject:
+          type: string
+        deleteAfterRead:
+          type: boolean
+        usersIds:
+          type: array
+          items:
+            type: string
+      required:
+        - message
+  parameters:
+    SearchFieldFilter:
+      in: query
+      name: searchField
+      description: Used for search. Specifies a field name to be filtered by.
+      schema:
+        type: string
+        enum:
+          - Subject
+          - Message
+          - All
+    SearchQueryFilter:
+      in: query
+      name: searchQuery
+      description: String for match.
+      schema:
+        type: string
+    SortField:
+      in: query
+      name: sortField
+      description: Used for sortings. Specifies a field name to be sorted by.
+      schema:
+        type: string
+    SortDir:
+      in: query
+      name: sortDir
+      description: Used for sortings. Specifies direction.
+      schema:
+        type: string
+        enum:
+          - ASC
+          - DESC
+    IsUnreadFilter:
+      in: query
+      name: isUnread
+      description: Applies filter by unread messages. Can be passed any value.
+      schema:
+        type: string
+    DateFromFilter:
+      in: query
+      name: dateFrom
+      description: Applies filter by created at time. Returns records where created at > passed date.
+      schema:
+        type: string
+    DateToFilter:
+      in: query
+      name: dateTo
+      description: Applies filter by created at time. Returns records where created at < passed date at 23:59:59.
+      schema:
+        type: string
+    Offset:
+      in: query
+      name: offset
+      description: messages offset
+      schema:
+        type: integer
+    Limit:
+      in: query
+      name: limit
+      description: limit of messages per page
+      schema:
+        type: integer
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
